@@ -110,7 +110,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    myDrive.arcadeDrive(controller.getY(),  controller.getX()); 
+    myDrive.arcadeDrive(controller.getY(),  controller.getAxis(Joystick.AxisType.kTwist)); 
 
   }
 

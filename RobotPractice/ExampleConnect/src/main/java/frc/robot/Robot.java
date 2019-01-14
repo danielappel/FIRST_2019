@@ -8,6 +8,9 @@
 package frc.robot;
 
 
+import edu.wpi.cscore.UsbCamera;
+import edu.wpi.first.wpilibj.CameraServer;
+
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PWMVictorSPX;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -15,7 +18,8 @@ import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
+import edu.wpi.cscore.*;
+import edu.wpi.first.cameraserver.*;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -46,7 +50,8 @@ public class Robot extends TimedRobot {
   // Differential Drive Declaration
 	DifferentialDrive myDrive = new DifferentialDrive(mRight, mLeft);
 
-  
+  // Camera Declaration
+  //UsbCamera camera = new UsbCamera("test", 0);
 
   /**
    * This function is run when the robot is first started up and should be
@@ -57,6 +62,8 @@ public class Robot extends TimedRobot {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
+    //camera = CameraServer.getInstance().startAutomaticCapture(0)
+    CameraServer.getInstance().startAutomaticCapture();
   }
 
   /**

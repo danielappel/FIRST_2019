@@ -48,6 +48,9 @@ public class Robot extends TimedRobot {
   // Differential Drive Declaration
 	DifferentialDrive myDrive = new DifferentialDrive(mRight, mLeft);
 
+  // Variable Declarations
+  private boolean triggerValue = false;
+
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
@@ -112,7 +115,19 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    myDrive.arcadeDrive(controller.getY()/2, controller.getAxis(Joystick.AxisType.kTwist)/2); 
+
+    /*
+    * when trigger is pressed full speed is enabled (this can be mapped to any button)
+    * when trigger is released robot moves at half speed
+    */
+    triggerValue = controller.getTrigger();
+    if(!triggerValue){
+      myDrive.arcadeDrive(controller.getY()/2, controller.getAxis(Joystick.AxisType.kTwist)/2); 
+    }
+    else{
+      myDrive.arcadeDrive(controller.getY(), controller.getAxis(Joystick.AxisType.kTwist)/2);
+    }
+      
 
   }
 

@@ -10,7 +10,12 @@ package frc.robot;
 
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
-
+//new stuff
+import org.opencv.core.Mat;
+import org.opencv.imgproc.Imgproc;
+import edu.wpi.cscore.CvSink;
+import edu.wpi.cscore.CvSource;
+//new stuff
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PWMVictorSPX;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -26,7 +31,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * creating this project, you must also update the build.gradle file in the
  * project.
  */
-public class Robot extends TimedRobot {
+public class Robot extends TimedRobot{
+  
+
   private static final String kDefaultAuto = "Default";
   private static final String kCustomAuto = "My Auto";
   private String m_autoSelected;
@@ -57,6 +64,31 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
+    //new stuff( 
+      
+      UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
+      camera.setResolution(640, 480);
+      
+      //Get OpenCV access to the primary camera feed.
+      CvSink cvSink = CameraServer.getInstance().getVideo();
+      //Create a MJPEG stream with OpenCV input.
+      CvSource outputStream = CameraServer.getInstance().putVideo("Blur", 640, 480);
+      
+      //object representing image(maybe)
+      Mat source = new Mat();
+      Mat output = new Mat();
+      
+      //Wait for the next frame and get the image.
+      cvSink.grabFrame(source);
+
+      //converts image to gray
+      Imgproc.cvtColor(source, output, Imgproc.COLOR_BGR2GRAY);
+
+      //Put an OpenCV image and notify sinks.
+      outputStream.putFrame(output);
+      
+  
+    //)new stuff
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);

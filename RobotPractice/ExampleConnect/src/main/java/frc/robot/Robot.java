@@ -69,8 +69,9 @@ public class Robot extends TimedRobot{
    */
   @Override
   public void robotInit() {
+    CameraServer.getInstance().startAutomaticCapture();
     //new stuff
-      
+     /* 
       UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
       camera.setResolution(640, 480);
       
@@ -91,14 +92,14 @@ public class Robot extends TimedRobot{
 
       //Put an OpenCV image and notify sinks.
       outputStream.putFrame(output);
-      
+      */
   
     //)new stuff
-    m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
+    /*m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
     
-    CameraServer.getInstance().startAutomaticCapture();
+    CameraServer.getInstance().startAutomaticCapture();*/
   }
 
   /**

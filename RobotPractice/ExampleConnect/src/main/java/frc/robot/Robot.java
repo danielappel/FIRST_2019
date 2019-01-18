@@ -17,6 +17,7 @@ import edu.wpi.cscore.CvSink;
 import edu.wpi.cscore.CvSource;
 //new stuff
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.buttons.*;
 import edu.wpi.first.wpilibj.PWMVictorSPX;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
@@ -57,6 +58,10 @@ public class Robot extends TimedRobot{
 
   // Variable Declarations
   private boolean triggerValue = false;
+  private boolean button2Value = false;
+
+  // Button Declarations
+  private JoystickButton button2 = new JoystickButton(controller, 2);
 
   /**
    * This function is run when the robot is first started up and should be
@@ -92,7 +97,7 @@ public class Robot extends TimedRobot{
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
-
+    
     CameraServer.getInstance().startAutomaticCapture();
   }
 
@@ -152,8 +157,8 @@ public class Robot extends TimedRobot{
     * when trigger is pressed full speed is enabled (this can be mapped to any button)
     * when trigger is released robot moves at half speed
     */
-    triggerValue = controller.getTrigger();
-    if(!triggerValue){
+    button2Value = button2.get();
+    if(!button2Value){
       myDrive.arcadeDrive(controller.getY()/2, controller.getAxis(Joystick.AxisType.kTwist)/2); 
     }
     else{

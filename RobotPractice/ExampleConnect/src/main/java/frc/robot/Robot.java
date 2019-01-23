@@ -45,7 +45,7 @@ public class Robot extends TimedRobot{
   PWMVictorSPX motor_rightFront = new PWMVictorSPX(2);
   PWMVictorSPX motor_leftRear = new PWMVictorSPX(0);
   PWMVictorSPX motor_leftFront = new PWMVictorSPX(1);
-
+  
   // Joystick Declaration
   Joystick controller = new Joystick(0);
 
@@ -61,6 +61,7 @@ public class Robot extends TimedRobot{
   private boolean button2Value = false;
 
   // Button Declarations
+  //test
   private JoystickButton button2 = new JoystickButton(controller, 2);
 
   /**
@@ -69,9 +70,9 @@ public class Robot extends TimedRobot{
    */
   @Override
   public void robotInit() {
-    CameraServer.getInstance().startAutomaticCapture();
+    ;
     //new stuff
-     /* 
+      
       UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
       camera.setResolution(640, 480);
       
@@ -83,7 +84,7 @@ public class Robot extends TimedRobot{
       //object representing image(maybe)
       Mat source = new Mat();
       Mat output = new Mat();
-      
+      /*
       //Wait for the next frame and get the image.
       cvSink.grabFrame(source);
 

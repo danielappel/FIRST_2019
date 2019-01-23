@@ -169,6 +169,12 @@ public class Robot extends TimedRobot{
     else if(button4.get()){
       testServo.setAngle(90);
     }
+    if(controller.getPOV()==90){
+      testServo.setAngle(0);
+    }
+    else if(controller.getPOV()==270){
+      testServo.setAngle(90);
+    }
       
      
 

@@ -10,17 +10,18 @@ package frc.robot;
 
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
-//new stuff
+
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
 import edu.wpi.cscore.CvSink;
 import edu.wpi.cscore.CvSource;
-//new stuff
+
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.*;
 import edu.wpi.first.wpilibj.PWMVictorSPX;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -45,7 +46,7 @@ public class Robot extends TimedRobot{
   PWMVictorSPX motor_rightFront = new PWMVictorSPX(2);
   PWMVictorSPX motor_leftRear = new PWMVictorSPX(0);
   PWMVictorSPX motor_leftFront = new PWMVictorSPX(1);
-
+  Servo testServo = new Servo (4);
   // Joystick Declaration
   Joystick controller = new Joystick(0);
 
@@ -58,20 +59,18 @@ public class Robot extends TimedRobot{
 
   // Variable Declarations
   private boolean triggerValue = false;
-  private boolean button2Value = false;
-
+  
   // Button Declarations
   private JoystickButton button2 = new JoystickButton(controller, 2);
-
+  private JoystickButton button3 = new JoystickButton(controller, 3);
+  private JoystickButton button4 = new JoystickButton(controller, 4);
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
    */
   @Override
   public void robotInit() {
-    CameraServer.getInstance().startAutomaticCapture();
-    // new stuff
-     /* 
+     
       UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
       camera.setResolution(640, 480);
       
@@ -83,7 +82,7 @@ public class Robot extends TimedRobot{
       //object representing image(maybe)
       Mat source = new Mat();
       Mat output = new Mat();
-      
+      /*
       //Wait for the next frame and get the image.
       cvSink.grabFrame(source);
 
@@ -158,14 +157,20 @@ public class Robot extends TimedRobot{
     * when trigger is pressed full speed is enabled (this can be mapped to any button)
     * when trigger is released robot moves at half speed
     */
-    button2Value = button2.get();
-    if(!button2Value){
+    if(!button2.get()){
       myDrive.arcadeDrive(controller.getY()/2, controller.getAxis(Joystick.AxisType.kTwist)/2); 
     }
     else{
       myDrive.arcadeDrive(controller.getY(), controller.getAxis(Joystick.AxisType.kTwist)/2);
     }
+    if(button3.get()){
+      testServo.setAngle(0);
+    }
+    else if(button4.get()){
+      testServo.setAngle(90);
+    }
       
+     
 
   }
 

@@ -19,6 +19,7 @@ import edu.wpi.cscore.CvSource;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.*;
 import edu.wpi.first.wpilibj.PWMVictorSPX;
+import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.Servo;
@@ -46,10 +47,12 @@ public class Robot extends TimedRobot{
   PWMVictorSPX motor_rightFront = new PWMVictorSPX(2);
   PWMVictorSPX motor_leftRear = new PWMVictorSPX(0);
   PWMVictorSPX motor_leftFront = new PWMVictorSPX(1);
+  Spark motor_top = new Spark(6);
   
   // Servo Declaration
-  Servo testServo = new Servo (4);
-
+  Servo cameraServoX = new Servo (4);
+  Servo cameraServoY = new Servo (5);
+  
   // Joystick Declaration
   Joystick controller = new Joystick(0);
 
@@ -171,13 +174,20 @@ public class Robot extends TimedRobot{
     else{
       myDrive.arcadeDrive(-1 * controller.getY(), controller.getAxis(Joystick.AxisType.kTwist)/2);
     }
+    //controls camera's horizontal moveement
     if(controller.getPOV()==90){
-      testServo.setAngle(testServo.getAngle()-3);
-      
+      cameraServoX.setAngle(cameraServoX.getAngle()-3);
     }
     else if(controller.getPOV()==270){
-      testServo.setAngle(testServo.getAngle()+3);
+      cameraServoX.setAngle(cameraServoX.getAngle()+3);
     }
+    //controls camera's vertical movement
+    if(controller.getPOV()==0){
+      cameraServoY.setAngle(cameraServoY.getAngle()-3);
+    }
+    else if(controller.getPOV()==180){
+      cameraServoY.setAngle(cameraServoY.getAngle()+3);
+    } 
       
      
 

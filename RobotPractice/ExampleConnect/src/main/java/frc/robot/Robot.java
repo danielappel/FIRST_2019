@@ -49,7 +49,7 @@ public class Robot extends TimedRobot{
   PWMVictorSPX motor_leftFront = new PWMVictorSPX(1);
   Spark motor_top = new Spark(6);
   
-  // Servo Declaration
+  // Servo Declarations
   Servo cameraServoX = new Servo (4);
   Servo cameraServoY = new Servo (5);
   
@@ -64,10 +64,8 @@ public class Robot extends TimedRobot{
 	DifferentialDrive myDrive = new DifferentialDrive(mRight, mLeft);
 
   // Variable Declarations
-  private boolean triggerValue = false;
   
   // Button Declarations
-  //test
   private JoystickButton button2 = new JoystickButton(controller, 2);
   private JoystickButton button3 = new JoystickButton(controller, 3);
   private JoystickButton button4 = new JoystickButton(controller, 4);
@@ -77,9 +75,7 @@ public class Robot extends TimedRobot{
    */
   @Override
   public void robotInit() {
-    //CameraServer.getInstance().startAutomaticCapture();
-    //new stuff
-      
+    new Thread(() -> {      
       UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
       camera.setResolution(640, 480);
       
@@ -91,16 +87,16 @@ public class Robot extends TimedRobot{
       //object representing image(maybe)
      Mat source = new Mat();
      Mat output = new Mat();
-      /*
-      //Wait for the next frame and get the image.
-      cvSink.grabFrame(source);
-
-      //converts image to gray
-      Imgproc.cvtColor(source, output, Imgproc.COLOR_BGR2GRAY);
-
-      //Put an OpenCV image and notify sinks.
-      outputStream.putFrame(output);
-      */
+   
+      while(!Thread.interrupted()) {
+        //Wait for the next frame and get the image.
+        cvSink.grabFrame(source);
+        //converts image to gray
+        Imgproc.cvtColor(source, output, Imgproc.COLOR_BGR2GRAY);
+        //Put an OpenCV image and notify sinks.
+        outputStream.putFrame(output);
+    }
+}).start();
   
     // new stuff
     /*m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
@@ -162,35 +158,8 @@ public class Robot extends TimedRobot{
    */
   @Override
   public void teleopPeriodic() {
-
-    /*
-    * when trigger is pressed full speed is enabled (this can be mapped to any button)
-    * when trigger is released robot moves at half speed
-    */
-    triggerValue = controller.getTrigger();
-    if(!triggerValue){
-      myDrive.arcadeDrive(-1 * controller.getY()/2, controller.getAxis(Joystick.AxisType.kTwist)/2); 
-    }
-    else{
-      myDrive.arcadeDrive(-1 * controller.getY(), controller.getAxis(Joystick.AxisType.kTwist)/2);
-    }
-    //controls camera's horizontal moveement
-    if(controller.getPOV()==90){
-      cameraServoX.setAngle(cameraServoX.getAngle()-3);
-    }
-    else if(controller.getPOV()==270){
-      cameraServoX.setAngle(cameraServoX.getAngle()+3);
-    }
-    //controls camera's vertical movement
-    if(controller.getPOV()==0){
-      cameraServoY.setAngle(cameraServoY.getAngle()-3);
-    }
-    else if(controller.getPOV()==180){
-      cameraServoY.setAngle(cameraServoY.getAngle()+3);
-    } 
-      
-     
-
+    robotMovement();
+    cameraMovement();
   }
 
   /**
@@ -200,4 +169,61 @@ public class Robot extends TimedRobot{
   public void testPeriodic() {
   }
   
+  public void robotMovement(){
+    /*
+    * when trigger is pressed full speed is enabled (this can be mapped to any button)
+    * when trigger is released robot moves at half speed
+    */
+    if(!controller.getTrigger()){
+      myDrive.arcadeDrive(-1 * controller.getY()/2, controller.getAxis(Joystick.AxisType.kTwist)/2); 
+    }
+    else{
+      myDrive.arcadeDrive(-1 * controller.getY(), controller.getAxis(Joystick.AxisType.kTwist)/2);
+    }
+  }
+  public void moveCameraX(int speed){
+  cameraServoX.setAngle(cameraServoX.getAngle()+speed);
+  }
+  public void moveCameraY(int speed){
+  cameraServoY.setAngle(cameraServoY.getAngle()+speed);
+  }
+  public void cameraMovement(){
+    //right
+    if(controller.getPOV()==90){
+      moveCameraX(3);
+    }
+    //left
+    else if(controller.getPOV()==270){
+      moveCameraX(-3);    
+    }
+    //up
+    if(controller.getPOV()==0){
+      moveCameraY(3);
+    }
+    //down
+    else if(controller.getPOV()==180){
+      moveCameraY(-3);
+    }  
+    //up right
+    if(controller.getPOV()==45){
+      moveCameraX(2);
+      moveCameraY(2);
+    }
+    //down right
+    else if(controller.getPOV()==135){
+      moveCameraX(2);
+      moveCameraY(-2);
+    }
+    //down left
+    else if(controller.getPOV()==225){
+      moveCameraX(-2);
+      moveCameraY(-2);
+    }
+    //up left
+    else if(controller.getPOV()==315){
+      moveCameraX(-2);
+      moveCameraY(2);
+    }
+  }
 }
+ 

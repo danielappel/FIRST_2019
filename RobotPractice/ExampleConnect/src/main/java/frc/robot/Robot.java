@@ -64,7 +64,8 @@ public class Robot extends TimedRobot{
 	DifferentialDrive myDrive = new DifferentialDrive(mRight, mLeft);
 
   // Variable Declarations
-  
+  int numberOfButton2Presses = 0;
+
   // Button Declarations
   private JoystickButton button2 = new JoystickButton(controller, 2);
   private JoystickButton button3 = new JoystickButton(controller, 3);
@@ -160,6 +161,7 @@ public class Robot extends TimedRobot{
   public void teleopPeriodic() {
     robotMovement();
     cameraMovement();
+    topMotorControl();
   }
 
   /**
@@ -181,6 +183,36 @@ public class Robot extends TimedRobot{
       myDrive.arcadeDrive(-1 * controller.getY(), controller.getAxis(Joystick.AxisType.kTwist)/2);
     }
   }
+
+  public void topMotorControl(){
+    if(controller.getRawButton(2)){
+      numberOfButton2Presses++;
+    }
+
+      if(numberOfButton2Presses % 2 == 1){
+
+        activateMotor();
+      }
+      else{
+        retractMotor();
+      }
+  
+    }
+
+  public void activateMotor(){
+    while(motor_top.getSpeed() < 5){
+      motor_top.set(motor_top.getSpeed()+.1);
+    }
+    motor_top.stopMotor();
+  }
+
+  public void retractMotor(){
+    while(motor_top.getSpeed() > 0){
+      motor_top.set(motor_top.getSpeed()-.1);
+    }
+    motor_top.stopMotor();
+  }
+
   public void moveCameraX(int speed){
   cameraServoX.setAngle(cameraServoX.getAngle()+speed);
   }

@@ -164,7 +164,7 @@ public class Robot extends TimedRobot{
     robotMovement();
     cameraMovement();
     topMotorControl();
-    breakInMotors();
+    //breakInMotors();
   }
 
   /**
@@ -270,8 +270,11 @@ public class Robot extends TimedRobot{
 
 
 public void breakInMotors(){
+  if(controller.getRawButton(11)){
+    numberOfButton11Presses++;
+  }
   if(numberOfButton11Presses % 2 == 1){
-    myDrive.arcadeDrive(100,100);
+    myDrive.arcadeDrive(.75,0);
   }
   else{
     myDrive.arcadeDrive(0, 0);

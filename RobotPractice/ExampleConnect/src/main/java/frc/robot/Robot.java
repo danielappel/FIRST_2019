@@ -66,6 +66,7 @@ public class Robot extends TimedRobot{
   // Variable Declarations
   private int numberOfButton2Presses = 0;
   private int numberOfTriggerPresses = 0;
+  private int numberOfButton11Presses = 0;
 
   // Button Declarations
   private JoystickButton button2 = new JoystickButton(controller, 2);
@@ -163,6 +164,7 @@ public class Robot extends TimedRobot{
     robotMovement();
     cameraMovement();
     topMotorControl();
+    breakInMotors();
   }
 
   /**
@@ -265,5 +267,15 @@ public class Robot extends TimedRobot{
       moveCameraY(2);
     }
   }
+
+
+public void breakInMotors(){
+  if(numberOfButton11Presses % 2 == 1){
+    myDrive.arcadeDrive(100,100);
+  }
+  else{
+    myDrive.arcadeDrive(0, 0);
+  }
+}
 }
  

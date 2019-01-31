@@ -64,7 +64,8 @@ public class Robot extends TimedRobot{
 	DifferentialDrive myDrive = new DifferentialDrive(mRight, mLeft);
 
   // Variable Declarations
-  int numberOfButton2Presses = 0;
+  private int numberOfButton2Presses = 0;
+  private int numberOfTriggerPresses = 0;
 
   // Button Declarations
   private JoystickButton button2 = new JoystickButton(controller, 2);
@@ -176,12 +177,19 @@ public class Robot extends TimedRobot{
     * when trigger is pressed full speed is enabled (this can be mapped to any button)
     * when trigger is released robot moves at half speed
     */
-    if(!controller.getTrigger()){
-      myDrive.arcadeDrive(-1 * controller.getY()/2, controller.getAxis(Joystick.AxisType.kTwist)/2); 
+    if(controller.getTriggerPressed()){
+      numberOfTriggerPresses++;
     }
-    else{
+
+    if(numberOfTriggerPresses % 2 == 1){
+      myDrive.arcadeDrive(-1 * controller.getY()/2, controller.getAxis(Joystick.AxisType.kTwist)/3; 
+    }
+    else {
       myDrive.arcadeDrive(-1 * controller.getY(), controller.getAxis(Joystick.AxisType.kTwist)/2);
     }
+
+
+
   }
 
   public void topMotorControl(){

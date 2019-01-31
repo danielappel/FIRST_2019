@@ -182,7 +182,7 @@ public class Robot extends TimedRobot{
     }
 
     if(numberOfTriggerPresses % 2 == 1){
-      myDrive.arcadeDrive(-1 * controller.getY()/2, controller.getAxis(Joystick.AxisType.kTwist)/3; 
+      myDrive.arcadeDrive(-1 * controller.getY()/2, controller.getAxis(Joystick.AxisType.kTwist)/3); 
     }
     else {
       myDrive.arcadeDrive(-1 * controller.getY(), controller.getAxis(Joystick.AxisType.kTwist)/2);

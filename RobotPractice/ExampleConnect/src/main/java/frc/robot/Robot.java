@@ -10,6 +10,7 @@ package frc.robot;
 
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
+import edu.wpi.first.wpilibj.vision.VisionThread;
 
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
@@ -42,12 +43,23 @@ public class Robot extends TimedRobot{
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
+  private GripPipeline findTarget;
+  private VisionThread findTargetThread;
+
+  private final Object visionLock = new Object();
+
+  private boolean pipelineRan = false; // lets us know when the pipeline has actually run
+  private double angleToTarget = 0;
+  private double distanceToTarget = 0;
+  
   // Motor Declarations
   PWMVictorSPX motor_rightRear = new PWMVictorSPX(3);
   PWMVictorSPX motor_rightFront = new PWMVictorSPX(2);
   PWMVictorSPX motor_leftRear = new PWMVictorSPX(0);
   PWMVictorSPX motor_leftFront = new PWMVictorSPX(1);
   Spark motor_top = new Spark(6);
+ 
+
   
   // Servo Declarations
   Servo cameraServoX = new Servo (4);
@@ -64,8 +76,7 @@ public class Robot extends TimedRobot{
 	DifferentialDrive myDrive = new DifferentialDrive(mRight, mLeft);
 
   // Variable Declarations
-  private int numberOfButton2Presses = 0;
-  private int numberOfTriggerPresses = 0;
+  private int speedMultiplier = 2;
   private int numberOfButton11Presses = 0;
 
   // Button Declarations
@@ -100,6 +111,7 @@ public class Robot extends TimedRobot{
         outputStream.putFrame(output);
     }
 }).start();
+
   
     // new stuff
     /*m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
@@ -179,50 +191,29 @@ public class Robot extends TimedRobot{
     * when trigger is pressed full speed is enabled (this can be mapped to any button)
     * when trigger is released robot moves at half speed
     */
-    if(controller.getTriggerPressed()){
-      numberOfTriggerPresses++;
-    }
+    
 
-    if(numberOfTriggerPresses % 2 == 1){
-      myDrive.arcadeDrive(-1 * controller.getY()/2, controller.getAxis(Joystick.AxisType.kTwist)/3); 
+    if(button3.get() && speedMultiplier!=3){
+      speedMultiplier ++;
+      System.out.println(speedMultiplier);
     }
-    else {
-      myDrive.arcadeDrive(-1 * controller.getY(), controller.getAxis(Joystick.AxisType.kTwist)/2);
+    if(button4.get() && speedMultiplier!=1){
+      speedMultiplier --;
+      System.out.println(speedMultiplier);
     }
-
-
+    if(!button2.get()){
+      myDrive.arcadeDrive(-1 * controller.getY()/speedMultiplier, controller.getAxis(Joystick.AxisType.kTwist)/speedMultiplier);
+    }
 
   }
 
   public void topMotorControl(){
-    if(controller.getRawButton(2)){
-      numberOfButton2Presses++;
+    if(button2.get()){
+      motor_top.setSpeed(controller.getY()/2);
     }
+  }
 
-      if(numberOfButton2Presses % 2 == 1){
-
-        activateMotor();
-      }
-      else{
-        retractMotor();
-      }
   
-    }
-
-  public void activateMotor(){
-    while(motor_top.getSpeed() < 5){
-      motor_top.set(motor_top.getSpeed()+.1);
-    }
-    motor_top.stopMotor();
-  }
-
-  public void retractMotor(){
-    while(motor_top.getSpeed() > 0){
-      motor_top.set(motor_top.getSpeed()-.1);
-    }
-    motor_top.stopMotor();
-  }
-
   public void moveCameraX(int speed){
   cameraServoX.setAngle(cameraServoX.getAngle()+speed);
   }
@@ -281,4 +272,5 @@ public void breakInMotors(){
   }
 }
 }
+
  

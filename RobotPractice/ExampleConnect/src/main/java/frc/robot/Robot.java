@@ -78,6 +78,7 @@ public class Robot extends TimedRobot{
   // Variable Declarations
   private int speedMultiplier = 2;
   private int numberOfButton11Presses = 0;
+  private boolean changeSpeed=false;
 
   // Button Declarations
   private JoystickButton button2 = new JoystickButton(controller, 2);
@@ -193,13 +194,14 @@ public class Robot extends TimedRobot{
     */
     
 
-    if(button3.get() && speedMultiplier!=3){
-      speedMultiplier ++;
-      System.out.println(speedMultiplier);
+    if(button3.get()){
+      speedMultiplier = 3;
     }
-    if(button4.get() && speedMultiplier!=1){
-      speedMultiplier --;
-      System.out.println(speedMultiplier);
+    else if(button4.get()){
+      speedMultiplier = 1;
+    }
+    else{
+      speedMultiplier = 2;
     }
     if(!button2.get()){
       myDrive.arcadeDrive(-1 * controller.getY()/speedMultiplier, controller.getAxis(Joystick.AxisType.kTwist)/speedMultiplier);
@@ -209,7 +211,10 @@ public class Robot extends TimedRobot{
 
   public void topMotorControl(){
     if(button2.get()){
-      motor_top.setSpeed(controller.getY()/2);
+      motor_top.setSpeed(-controller.getY()/3);
+    }
+    else {
+      motor_top.setSpeed(0);
     }
   }
 

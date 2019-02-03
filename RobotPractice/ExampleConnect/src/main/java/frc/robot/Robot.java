@@ -27,6 +27,8 @@ import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -57,7 +59,7 @@ public class Robot extends TimedRobot{
   PWMVictorSPX motor_rightFront = new PWMVictorSPX(2);
   PWMVictorSPX motor_leftRear = new PWMVictorSPX(0);
   PWMVictorSPX motor_leftFront = new PWMVictorSPX(1);
-  Spark motor_top = new Spark(6);
+  Spark motor_panelGrabber = new Spark(6);
  
 
   
@@ -65,8 +67,9 @@ public class Robot extends TimedRobot{
   Servo cameraServoX = new Servo (4);
   Servo cameraServoY = new Servo (5);
   
-  // Joystick Declaration
+  // Controller Declarations
   Joystick controller = new Joystick(0);
+  XboxController controller2 = new XboxController(1);
 
   // Speed Declarations
 	SpeedControllerGroup mRight = new SpeedControllerGroup(motor_rightRear, motor_rightFront);
@@ -76,9 +79,9 @@ public class Robot extends TimedRobot{
 	DifferentialDrive myDrive = new DifferentialDrive(mRight, mLeft);
 
   // Variable Declarations
-  private int speedMultiplier = 2;
+  private double speedMultiplier = 2.0;
   private int numberOfButton11Presses = 0;
-  private boolean changeSpeed=false;
+  private double speedAdder = 0.0;
 
   // Button Declarations
   private JoystickButton button2 = new JoystickButton(controller, 2);
@@ -184,7 +187,7 @@ public class Robot extends TimedRobot{
    * This function is called periodically during test mode.
    */
   @Override
-  public void testPeriodic() {
+  public void testPeriodic(){
   }
   
   public void robotMovement(){
@@ -193,32 +196,29 @@ public class Robot extends TimedRobot{
     * when trigger is released robot moves at half speed
     */
     
-
+//jay is an epic gamer and this was his idea 
     if(button3.get()){
-      speedMultiplier = 3;
+      //hold button 3 to keep robot slow
+      speedMultiplier = 2.5;
     }
     else if(button4.get()){
-      speedMultiplier = 1;
+      //hold button 4 to speed up gradually
+      speedAdder += 0.005;
     }
     else{
+      //default speed
+      speedAdder = 0;
       speedMultiplier = 2;
     }
-    if(!button2.get()){
-      myDrive.arcadeDrive(-1 * controller.getY()/speedMultiplier, controller.getAxis(Joystick.AxisType.kTwist)/speedMultiplier);
-    }
-
+    myDrive.arcadeDrive(-1 * controller.getY()/speedMultiplier+speedAdder, controller.getAxis(Joystick.AxisType.kTwist)/speedMultiplier);
+    System.out.println(controller.getY()/speedMultiplier+speedAdder);
   }
-
   public void topMotorControl(){
-    if(button2.get()){
-      motor_top.setSpeed(-controller.getY()/3);
-    }
-    else {
-      motor_top.setSpeed(0);
-    }
+    motor_panelGrabber.setSpeed(controller2.getY(Hand.kRight));
+
   }
 
-  
+
   public void moveCameraX(int speed){
   cameraServoX.setAngle(cameraServoX.getAngle()+speed);
   }

@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.vision.VisionThread;
 
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
+import frc.robot.grip.GripPipeline;
 import org.opencv.core.Rect;
 import edu.wpi.cscore.CvSink;
 import edu.wpi.cscore.CvSource;
@@ -42,22 +43,22 @@ import java.lang.Math;
  */
 public class Robot extends TimedRobot{
   
-
+   
   private static final String kDefaultAuto = "Default";
   private static final String kCustomAuto = "My Auto";
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
   
-  Rect imageToProcess;
+  private static GripPipeline myPipeline = new GripPipeline();
   // Motor Declarations
   PWMVictorSPX motor_rightRear = new PWMVictorSPX(3);
   PWMVictorSPX motor_rightFront = new PWMVictorSPX(2);
   PWMVictorSPX motor_leftRear = new PWMVictorSPX(0);
   PWMVictorSPX motor_leftFront = new PWMVictorSPX(1);
   Spark motor_panelGrabber = new Spark(6);
+  Spark motor_lift = new Spark(7);
  
 
-  
   // Servo Declarations
   Servo cameraServoX = new Servo (4);
   Servo cameraServoY = new Servo (5);
@@ -187,6 +188,7 @@ public class Robot extends TimedRobot{
   }
   
   public void visionCode(){
+    //Rect r = Imgproc.boundingRect(myPipeline.filterContoursOutput.get(0));
   }
   public void robotMovement(){
     /*
@@ -214,7 +216,7 @@ public class Robot extends TimedRobot{
       System.out.println(controller.getY()/speedMultiplier+speedAdder);
     }
     else if(currentController == 2){
-      
+
     }
 
   }
@@ -228,7 +230,7 @@ public class Robot extends TimedRobot{
     else if(currentController == 2){
 
     }
-      
+    motor_lift.setSpeed(controller2.getY(Hand.kLeft));
   }
 
 

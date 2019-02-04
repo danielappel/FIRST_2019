@@ -193,52 +193,30 @@ public class Robot extends TimedRobot{
     * when trigger is pressed full speed is enabled (this can be mapped to any button)
     * when trigger is released robot moves at half speed
     */
-    
-<<<<<<< HEAD
-//jay is an epic gamer and this was his idea 
-    if(button3.get()){
-      //hold button 3 to keep robot slow
-      speedMultiplier = 2.5;
-    }
-    else if(button4.get()){
-      //hold button 4 to speed up "gradually"
-      if(speedAdder < .5) //safety
-        speedAdder += 0.005;
-    }
-    else{
-      //default speed
-      if(speedAdder > 0)
-        speedAdder -= 0.005;
-      speedMultiplier = 2;
-    }
-    myDrive.arcadeDrive(-1 * controller.getY()/speedMultiplier + speedAdder, controller.getAxis(Joystick.AxisType.kTwist)/speedMultiplier);
-    System.out.println(controller.getY()/speedMultiplier+speedAdder);
-=======
     if(currentController == 1){
-          //jay is an epic gamer and this was his idea 
+      //jay is an epic gamer and this was his idea 
       if(button3.get()){
         //hold button 3 to keep robot slow
         speedMultiplier = 2.5;
       }
       else if(button4.get()){
-        //hold button 4 to speed up gradually
-        speedAdder += 0.005;
+        //hold button 4 to speed up "gradually"
+        if(speedAdder < .5) //safety
+          speedAdder += 0.005;
       }
       else{
         //default speed
-        speedAdder = 0;
+        if(speedAdder > 0)
+          speedAdder -= 0.005;
         speedMultiplier = 2;
       }
-      myDrive.arcadeDrive(-1 * controller.getY()/speedMultiplier+speedAdder, controller.getAxis(Joystick.AxisType.kTwist)/speedMultiplier);
+      myDrive.arcadeDrive(-1 * controller.getY()/speedMultiplier + speedAdder, controller.getAxis(Joystick.AxisType.kTwist)/speedMultiplier);
       System.out.println(controller.getY()/speedMultiplier+speedAdder);
-
     }
     else if(currentController == 2){
-
+      
     }
 
-
->>>>>>> 8bec731a616d6de79beaf2c5aa2d649b76d26d8f
   }
 
 

@@ -65,6 +65,7 @@ public class Robot extends TimedRobot{
   // Controller Declarations
   Joystick controller = new Joystick(0);
   XboxController controller2 = new XboxController(1);
+  int currentController = 1;
 
   // Speed Declarations
 	SpeedControllerGroup mRight = new SpeedControllerGroup(motor_rightRear, motor_rightFront);
@@ -193,6 +194,7 @@ public class Robot extends TimedRobot{
     * when trigger is released robot moves at half speed
     */
     
+<<<<<<< HEAD
 //jay is an epic gamer and this was his idea 
     if(button3.get()){
       //hold button 3 to keep robot slow
@@ -211,56 +213,98 @@ public class Robot extends TimedRobot{
     }
     myDrive.arcadeDrive(-1 * controller.getY()/speedMultiplier + speedAdder, controller.getAxis(Joystick.AxisType.kTwist)/speedMultiplier);
     System.out.println(controller.getY()/speedMultiplier+speedAdder);
-  }
-  public void topMotorControl(){
-    motor_panelGrabber.setSpeed(controller2.getY(Hand.kRight));
+=======
+    if(currentController == 1){
+          //jay is an epic gamer and this was his idea 
+      if(button3.get()){
+        //hold button 3 to keep robot slow
+        speedMultiplier = 2.5;
+      }
+      else if(button4.get()){
+        //hold button 4 to speed up gradually
+        speedAdder += 0.005;
+      }
+      else{
+        //default speed
+        speedAdder = 0;
+        speedMultiplier = 2;
+      }
+      myDrive.arcadeDrive(-1 * controller.getY()/speedMultiplier+speedAdder, controller.getAxis(Joystick.AxisType.kTwist)/speedMultiplier);
+      System.out.println(controller.getY()/speedMultiplier+speedAdder);
 
+    }
+    else if(currentController == 2){
+
+    }
+
+
+>>>>>>> 8bec731a616d6de79beaf2c5aa2d649b76d26d8f
+  }
+
+
+  public void topMotorControl(){
+    if(currentController == 1){
+      motor_panelGrabber.setSpeed(controller2.getY(Hand.kRight));
+
+    }
+    else if(currentController == 2){
+
+    }
+      
   }
 
 
   public void moveCameraX(int speed){
-  cameraServoX.setAngle(cameraServoX.getAngle()+speed);
+    cameraServoX.setAngle(cameraServoX.getAngle()+speed);
   }
   public void moveCameraY(int speed){
-  cameraServoY.setAngle(cameraServoY.getAngle()+speed);
+    cameraServoY.setAngle(cameraServoY.getAngle()+speed);
   }
+
   public void cameraMovement(){
-    //right
-    if(controller.getPOV()==90){
-      moveCameraX(3);
+
+    if(currentController == 1){
+      //right
+      if(controller.getPOV()==90){
+        moveCameraX(3);
+      }
+      //left
+      else if(controller.getPOV()==270){
+        moveCameraX(-3);    
+      }
+      //up
+      if(controller.getPOV()==0){
+        moveCameraY(3);
+      }
+      //down
+      else if(controller.getPOV()==180){
+        moveCameraY(-3);
+      }  
+      //up right
+      if(controller.getPOV()==45){
+        moveCameraX(2);
+        moveCameraY(2);
+      }
+      //down right
+      else if(controller.getPOV()==135){
+        moveCameraX(2);
+        moveCameraY(-2);
+      }
+      //down left
+      else if(controller.getPOV()==225){
+        moveCameraX(-2);
+        moveCameraY(-2);
+      }
+      //up left
+      else if(controller.getPOV()==315){
+        moveCameraX(-2);
+        moveCameraY(2);
+      }
     }
-    //left
-    else if(controller.getPOV()==270){
-      moveCameraX(-3);    
+    else if(currentController == 2){
+
     }
-    //up
-    if(controller.getPOV()==0){
-      moveCameraY(3);
-    }
-    //down
-    else if(controller.getPOV()==180){
-      moveCameraY(-3);
-    }  
-    //up right
-    if(controller.getPOV()==45){
-      moveCameraX(2);
-      moveCameraY(2);
-    }
-    //down right
-    else if(controller.getPOV()==135){
-      moveCameraX(2);
-      moveCameraY(-2);
-    }
-    //down left
-    else if(controller.getPOV()==225){
-      moveCameraX(-2);
-      moveCameraY(-2);
-    }
-    //up left
-    else if(controller.getPOV()==315){
-      moveCameraX(-2);
-      moveCameraY(2);
-    }
+    
   }
 
 

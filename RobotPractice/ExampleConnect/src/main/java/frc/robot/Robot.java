@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.vision.VisionThread;
 
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
+import org.opencv.core.Rect;
 import edu.wpi.cscore.CvSink;
 import edu.wpi.cscore.CvSource;
 
@@ -30,6 +31,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 
+import java.lang.Math;
+
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to each mode, as described in the TimedRobot
@@ -44,16 +47,8 @@ public class Robot extends TimedRobot{
   private static final String kCustomAuto = "My Auto";
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
-
-  private GripPipeline findTarget;
-  private VisionThread findTargetThread;
-
-  private final Object visionLock = new Object();
-
-  private boolean pipelineRan = false; // lets us know when the pipeline has actually run
-  private double angleToTarget = 0;
-  private double distanceToTarget = 0;
   
+  Rect imageToProcess;
   // Motor Declarations
   PWMVictorSPX motor_rightRear = new PWMVictorSPX(3);
   PWMVictorSPX motor_rightFront = new PWMVictorSPX(2);
@@ -190,6 +185,8 @@ public class Robot extends TimedRobot{
   public void testPeriodic(){
   }
   
+  public void visionCode(){
+  }
   public void robotMovement(){
     /*
     * when trigger is pressed full speed is enabled (this can be mapped to any button)
@@ -202,15 +199,17 @@ public class Robot extends TimedRobot{
       speedMultiplier = 2.5;
     }
     else if(button4.get()){
-      //hold button 4 to speed up gradually
-      speedAdder += 0.005;
+      //hold button 4 to speed up "gradually"
+      if(speedAdder < .5) //safety
+        speedAdder += 0.005;
     }
     else{
       //default speed
-      speedAdder = 0;
+      if(speedAdder > 0)
+        speedAdder -= 0.005;
       speedMultiplier = 2;
     }
-    myDrive.arcadeDrive(-1 * controller.getY()/speedMultiplier+speedAdder, controller.getAxis(Joystick.AxisType.kTwist)/speedMultiplier);
+    myDrive.arcadeDrive(-1 * controller.getY()/speedMultiplier + speedAdder, controller.getAxis(Joystick.AxisType.kTwist)/speedMultiplier);
     System.out.println(controller.getY()/speedMultiplier+speedAdder);
   }
   public void topMotorControl(){

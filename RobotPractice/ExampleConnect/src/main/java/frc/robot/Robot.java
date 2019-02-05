@@ -10,6 +10,7 @@ package frc.robot;
 
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.vision.VisionThread;
 
 import org.opencv.core.Mat;
@@ -79,11 +80,20 @@ public class Robot extends TimedRobot{
   private double speedMultiplier = 2.0;
   private int numberOfButton11Presses = 0;
   private double speedAdder = 0.0;
+    // Declarations for two stick driving on the xbox controller
+    private double max_speed_Y = 0.75;
+    private double max_speed_X = 0.5;
+
 
   // Button Declarations
   private JoystickButton button2 = new JoystickButton(controller, 2);
   private JoystickButton button3 = new JoystickButton(controller, 3);
   private JoystickButton button4 = new JoystickButton(controller, 4);
+
+  // Hand Declarations
+  public static final GenericHID.Hand kRight;
+  public static final GenericHID.Hand kLeft;
+
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
@@ -216,7 +226,7 @@ public class Robot extends TimedRobot{
       System.out.println(controller.getY()/speedMultiplier+speedAdder);
     }
     else if(currentController == 2){
-
+      myDrive.arcadeDrive(controller2.getY(kLeft) * max_speed_Y, controller2.getX(kRight) * max_speed_X);
     }
 
   }
@@ -224,13 +234,22 @@ public class Robot extends TimedRobot{
 
   public void topMotorControl(){
     if(currentController == 1){
-      motor_panelGrabber.setSpeed(controller2.getY(Hand.kRight));
-
+      if(controller.getRawButton(2)){
+        motor_panelGrabber.setSpeed(controller.getY());
+      }
     }
+      
     else if(currentController == 2){
-
+      if(controller2.getTriggerAxis(kRight) != 0){
+        motor_panelGrabber.setSpeed(controller2.getTriggerAxis(kRight));
+      }
+      else if(controller2.getTriggerAxis(kLeft) != 0){
+        motor_panelGrabber.setSpeed(-1 * controller2.getTriggerAxis(kLeft));
+      }
+      else{
+        motor_panelGrabber.setSpeed(0);
+      }
     }
-    motor_lift.setSpeed(controller2.getY(Hand.kLeft));
   }
 
 

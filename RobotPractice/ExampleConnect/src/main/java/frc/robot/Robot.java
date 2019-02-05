@@ -240,11 +240,12 @@ public class Robot extends TimedRobot{
     }
       
     else if(currentController == 2){
-      if(controller2.getTriggerAxis(kRight) != 0){
-        motor_panelGrabber.setSpeed(controller2.getTriggerAxis(kRight));
+      if(controller2.getAButton()){
+
+        motor_panelGrabber.setSpeed(0.375);
       }
-      else if(controller2.getTriggerAxis(kLeft) != 0){
-        motor_panelGrabber.setSpeed(-1 * controller2.getTriggerAxis(kLeft));
+      else if(controller2.getBButtonPressed()){
+        motor_panelGrabber.setSpeed(-1 * 0.375);
       }
       else{
         motor_panelGrabber.setSpeed(0);
@@ -256,6 +257,7 @@ public class Robot extends TimedRobot{
   public void moveCameraX(int speed){
     cameraServoX.setAngle(cameraServoX.getAngle()+speed);
   }
+
   public void moveCameraY(int speed){
     cameraServoY.setAngle(cameraServoY.getAngle()+speed);
   }
@@ -301,7 +303,19 @@ public class Robot extends TimedRobot{
       }
     }
     else if(currentController == 2){
-
+      if(controller2.getTriggerAxis(kRight) != 0){
+        moveCameraX(3);
+      }
+      else if(controller2.getTriggerAxis(kLeft) != 0){
+        moveCameraX(-3);
+      }
+      
+      if(controller2.getBumperPressed(kRight)){
+        moveCameraY(3);
+      }
+      else if(controller2.getBumperPressed(kLeft)){
+        moveCameraY(-3);
+      }
     }
     
   }

@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.vision.VisionThread;
 
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
-import frc.robot.grip.GripPipeline;
+//import frc.robot.grip.GripPipeline;
 import org.opencv.core.Rect;
 import edu.wpi.cscore.CvSink;
 import edu.wpi.cscore.CvSource;
@@ -56,8 +56,8 @@ public class Robot extends TimedRobot{
   PWMVictorSPX motor_rightFront = new PWMVictorSPX(2);
   PWMVictorSPX motor_leftRear = new PWMVictorSPX(0);
   PWMVictorSPX motor_leftFront = new PWMVictorSPX(1);
-  Spark motor_panelGrabber = new Spark(6);
-  Spark motor_lift = new Spark(7);
+  Spark motor_panelGrabber = new Spark(7);
+  Spark motor_lift = new Spark(6);
  
 
   // Servo Declarations
@@ -90,9 +90,6 @@ public class Robot extends TimedRobot{
   private JoystickButton button3 = new JoystickButton(controller, 3);
   private JoystickButton button4 = new JoystickButton(controller, 4);
 
-  // Hand Declarations
-  public static final GenericHID.Hand kRight;
-  public static final GenericHID.Hand kLeft;
 
   /**
    * This function is run when the robot is first started up and should be
@@ -186,7 +183,8 @@ public class Robot extends TimedRobot{
   public void teleopPeriodic() {
     robotMovement();
     cameraMovement();
-    topMotorControl();
+    hatchMotor();
+    cargoMotor();
     //breakInMotors();
   }
 
@@ -226,13 +224,21 @@ public class Robot extends TimedRobot{
       System.out.println(controller.getY()/speedMultiplier+speedAdder);
     }
     else if(currentController == 2){
-      myDrive.arcadeDrive(controller2.getY(kLeft) * max_speed_Y, controller2.getX(kRight) * max_speed_X);
+      myDrive.arcadeDrive(controller2.getY(Hand.kLeft) * max_speed_Y, controller2.getX(Hand.kRight) * max_speed_X);
     }
 
   }
 
+  public void cargoMotor(){
+    if(currentController == 1){
+      if(controller.getTrigger()){
+        motor_lift.setSpeed(controller.getY());
+      }
 
-  public void topMotorControl(){
+    }
+  }
+
+  public void hatchMotor(){
     if(currentController == 1){
       if(controller.getRawButton(2)){
         motor_panelGrabber.setSpeed(controller.getY());
@@ -303,17 +309,17 @@ public class Robot extends TimedRobot{
       }
     }
     else if(currentController == 2){
-      if(controller2.getTriggerAxis(kRight) != 0){
+      if(controller2.getTriggerAxis(Hand.kRight) != 0){
         moveCameraX(3);
       }
-      else if(controller2.getTriggerAxis(kLeft) != 0){
+      else if(controller2.getTriggerAxis(Hand.kLeft) != 0){
         moveCameraX(-3);
       }
       
-      if(controller2.getBumperPressed(kRight)){
+      if(controller2.getBumperPressed(Hand.kRight)){
         moveCameraY(3);
       }
-      else if(controller2.getBumperPressed(kLeft)){
+      else if(controller2.getBumperPressed(Hand.kLeft)){
         moveCameraY(-3);
       }
     }

@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.vision.VisionThread;
 
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
-import frc.robot.grip.GripPipeline;
 import org.opencv.core.Rect;
 import edu.wpi.cscore.CvSink;
 import edu.wpi.cscore.CvSource;
@@ -56,8 +55,8 @@ public class Robot extends TimedRobot{
   PWMVictorSPX motor_rightFront = new PWMVictorSPX(2);
   PWMVictorSPX motor_leftRear = new PWMVictorSPX(0);
   PWMVictorSPX motor_leftFront = new PWMVictorSPX(1);
-  Spark motor_panelGrabber = new Spark(6);
-  Spark motor_lift = new Spark(7);
+  Spark motor_panelGrabber = new Spark(7);
+  Spark motor_lift = new Spark(6);
  
 
   // Servo Declarations
@@ -90,8 +89,6 @@ public class Robot extends TimedRobot{
   private JoystickButton button4 = new JoystickButton(controller, 4);
 
   // Hand Declarations
-  public static final GenericHID.Hand kRight;
-  public static final GenericHID.Hand kLeft;
 
   /**
    * This function is run when the robot is first started up and should be
@@ -229,26 +226,26 @@ public class Robot extends TimedRobot{
 
 
   public void hatchMotorControl(){    
-    if(controller2.getAButton()){
-      motor_panelGrabber.setSpeed(0.375);
+    if(controller2.getTriggerAxis(Hand.kRight) > 0){
+      motor_lift.setSpeed(1);
     }
-    else if(controller2.getBButtonPressed()){
-      motor_panelGrabber.setSpeed(-1 * 0.375);
+    else if(controller2.getTriggerAxis(Hand.kLeft) > 0){
+      motor_lift.setSpeed(-1);
     }
     else{
-      motor_panelGrabber.setSpeed(0);
+      motor_lift.setSpeed(0);
     }  
   }
 
   public void liftMotorControl(){
-    if(controller2.getBumper(kRight)){
-      motor_lift.setSpeed(.25);
+    if(controller2.getBumper(Hand.kRight)){
+      motor_panelGrabber.setSpeed(.375);
     }
-    else if(controller2.getBumper(kLeft)){
-      motor_lift.setSpeed(-.25);
+    else if(controller2.getBumper(Hand.kLeft)){
+      motor_panelGrabber.setSpeed(-.375);
     }
     else{
-      motor_lift.setSpeed(0);
+      motor_panelGrabber.setSpeed(0);
     }
   }
 

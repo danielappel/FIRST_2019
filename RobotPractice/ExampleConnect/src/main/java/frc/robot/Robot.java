@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.vision.VisionThread;
 
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
-//import frc.robot.grip.GripPipeline;
+import frc.robot.grip.GripPipeline;
 import org.opencv.core.Rect;
 import edu.wpi.cscore.CvSink;
 import edu.wpi.cscore.CvSource;
@@ -56,8 +56,8 @@ public class Robot extends TimedRobot{
   PWMVictorSPX motor_rightFront = new PWMVictorSPX(2);
   PWMVictorSPX motor_leftRear = new PWMVictorSPX(0);
   PWMVictorSPX motor_leftFront = new PWMVictorSPX(1);
-  Spark motor_panelGrabber = new Spark(7);
-  Spark motor_lift = new Spark(6);
+  Spark motor_panelGrabber = new Spark(6);
+  Spark motor_lift = new Spark(7);
  
 
   // Servo Declarations
@@ -67,7 +67,6 @@ public class Robot extends TimedRobot{
   // Controller Declarations
   Joystick controller = new Joystick(0);
   XboxController controller2 = new XboxController(1);
-  int currentController = 1;
 
   // Speed Declarations
 	SpeedControllerGroup mRight = new SpeedControllerGroup(motor_rightRear, motor_rightFront);
@@ -90,6 +89,9 @@ public class Robot extends TimedRobot{
   private JoystickButton button3 = new JoystickButton(controller, 3);
   private JoystickButton button4 = new JoystickButton(controller, 4);
 
+  // Hand Declarations
+  public static final GenericHID.Hand kRight;
+  public static final GenericHID.Hand kLeft;
 
   /**
    * This function is run when the robot is first started up and should be
@@ -183,8 +185,8 @@ public class Robot extends TimedRobot{
   public void teleopPeriodic() {
     robotMovement();
     cameraMovement();
-    hatchMotor();
-    cargoMotor();
+    liftMotorControl();
+    hatchMotorControl();
     //breakInMotors();
   }
 
@@ -203,7 +205,6 @@ public class Robot extends TimedRobot{
     * when trigger is pressed full speed is enabled (this can be mapped to any button)
     * when trigger is released robot moves at half speed
     */
-    if(currentController == 1){
       //jay is an epic gamer and this was his idea 
       if(button3.get()){
         //hold button 3 to keep robot slow
@@ -222,40 +223,32 @@ public class Robot extends TimedRobot{
       }
       myDrive.arcadeDrive(-1 * controller.getY()/speedMultiplier + speedAdder, controller.getAxis(Joystick.AxisType.kTwist)/speedMultiplier);
       System.out.println(controller.getY()/speedMultiplier+speedAdder);
-    }
-    else if(currentController == 2){
-      myDrive.arcadeDrive(controller2.getY(Hand.kLeft) * max_speed_Y, controller2.getX(Hand.kRight) * max_speed_X);
-    }
+    
 
   }
 
-  public void cargoMotor(){
-    if(currentController == 1){
-      if(controller.getTrigger()){
-        motor_lift.setSpeed(controller.getY());
-      }
 
+  public void hatchMotorControl(){    
+    if(controller2.getAButton()){
+      motor_panelGrabber.setSpeed(0.375);
     }
+    else if(controller2.getBButtonPressed()){
+      motor_panelGrabber.setSpeed(-1 * 0.375);
+    }
+    else{
+      motor_panelGrabber.setSpeed(0);
+    }  
   }
 
-  public void hatchMotor(){
-    if(currentController == 1){
-      if(controller.getRawButton(2)){
-        motor_panelGrabber.setSpeed(controller.getY());
-      }
+  public void liftMotorControl(){
+    if(controller2.getBumper(kRight)){
+      motor_lift.setSpeed(.25);
     }
-      
-    else if(currentController == 2){
-      if(controller2.getAButton()){
-
-        motor_panelGrabber.setSpeed(0.375);
-      }
-      else if(controller2.getBButtonPressed()){
-        motor_panelGrabber.setSpeed(-1 * 0.375);
-      }
-      else{
-        motor_panelGrabber.setSpeed(0);
-      }
+    else if(controller2.getBumper(kLeft)){
+      motor_lift.setSpeed(-.25);
+    }
+    else{
+      motor_lift.setSpeed(0);
     }
   }
 
@@ -270,7 +263,6 @@ public class Robot extends TimedRobot{
 
   public void cameraMovement(){
 
-    if(currentController == 1){
       //right
       if(controller.getPOV()==90){
         moveCameraX(3);
@@ -307,37 +299,23 @@ public class Robot extends TimedRobot{
         moveCameraX(-2);
         moveCameraY(2);
       }
-    }
-    else if(currentController == 2){
-      if(controller2.getTriggerAxis(Hand.kRight) != 0){
-        moveCameraX(3);
-      }
-      else if(controller2.getTriggerAxis(Hand.kLeft) != 0){
-        moveCameraX(-3);
-      }
-      
-      if(controller2.getBumperPressed(Hand.kRight)){
-        moveCameraY(3);
-      }
-      else if(controller2.getBumperPressed(Hand.kLeft)){
-        moveCameraY(-3);
-      }
-    }
+    
+  
     
   }
 
 
-public void breakInMotors(){
-  if(controller.getRawButton(11)){
-    numberOfButton11Presses++;
+  public void breakInMotors(){
+    if(controller.getRawButton(11)){
+      numberOfButton11Presses++;
+    }
+    if(numberOfButton11Presses % 2 == 1){
+      myDrive.arcadeDrive(.75,0);
+    }
+    else{
+      myDrive.arcadeDrive(0, 0);
+    }
   }
-  if(numberOfButton11Presses % 2 == 1){
-    myDrive.arcadeDrive(.75,0);
-  }
-  else{
-    myDrive.arcadeDrive(0, 0);
-  }
-}
 }
 
- 
+    

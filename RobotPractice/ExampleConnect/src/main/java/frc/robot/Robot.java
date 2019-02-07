@@ -13,9 +13,16 @@ import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.vision.VisionThread;
 
+import org.opencv.core.Core;
 import org.opencv.core.Mat;
-import org.opencv.imgproc.Imgproc;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.Point;
 import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
+import org.opencv.core.Size;
+import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.imgproc.Imgproc;
+import org.opencv.videoio.VideoCapture;
 import edu.wpi.cscore.CvSink;
 import edu.wpi.cscore.CvSource;
 
@@ -49,7 +56,7 @@ public class Robot extends TimedRobot{
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
   
-  private static GripPipeline myPipeline = new GripPipeline();
+
   // Motor Declarations
   PWMVictorSPX motor_rightRear = new PWMVictorSPX(3);
   PWMVictorSPX motor_rightFront = new PWMVictorSPX(2);
@@ -88,6 +95,11 @@ public class Robot extends TimedRobot{
   private JoystickButton button3 = new JoystickButton(controller, 3);
   private JoystickButton button4 = new JoystickButton(controller, 4);
 
+  //vision declarations
+  private static GripPipeline myPipeline = new GripPipeline();
+  static double[]centerX;
+  static double lengthBetweenContours;
+
   // Hand Declarations
 
   /**
@@ -95,31 +107,11 @@ public class Robot extends TimedRobot{
    * used for any initialization code.
    */
   @Override
-  public void robotInit() {
-    new Thread(() -> {      
+  public void robotInit() {      
       UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
       camera.setResolution(640, 480);
       
-      //Get OpenCV access to the primary camera feed.
-      CvSink cvSink = CameraServer.getInstance().getVideo();
-      //Create a MJPEG stream with OpenCV input.
-      CvSource outputStream = CameraServer.getInstance().putVideo("Blur", 640, 480);
-      
-      //object representing image(maybe)
-     Mat source = new Mat();
-     Mat output = new Mat();
-   
-      while(!Thread.interrupted()) {
-        //Wait for the next frame and get the image.
-        cvSink.grabFrame(source);
-        //converts image to gray
-        Imgproc.cvtColor(source, output, Imgproc.COLOR_BGR2GRAY);
-        //Put an OpenCV image and notify sinks.
-        outputStream.putFrame(output);
-    }
-}).start();
 
-  
     // new stuff
     /*m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
@@ -195,7 +187,18 @@ public class Robot extends TimedRobot{
   }
   
   public void visionCode(){
-    //Rect r = Imgproc.boundingRect(myPipeline.filterContoursOutput.get(0));
+    Rect r = Imgproc.boundingRect(myPipeline.filterContoursOutput().get(0));
+    Rect r1 = Imgproc.boundingRect(myPipeline.filterContoursOutput().get(1));
+    centerX = new double[]{r1.x + (r1.width / 2), r.x + (r.width / 2)};
+    if(myPipeline.filterContoursOutput().size() == 2){
+      // subtracts one another to get length in pixels
+      lengthBetweenContours = Math.abs(centerX[0] - centerX[1]);
+      System.out.println("I see: " + centerX.length);
+    }
+  }
+
+  public void findCenter(){
+    
   }
   public void robotMovement(){
     /*

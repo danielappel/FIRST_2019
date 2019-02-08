@@ -222,13 +222,11 @@ public class Robot extends TimedRobot{
         speedMultiplier = 2;
       }
       myDrive.arcadeDrive(-1 * controller.getY()/speedMultiplier + speedAdder, controller.getAxis(Joystick.AxisType.kTwist)/speedMultiplier);
-      System.out.println(controller.getY()/speedMultiplier+speedAdder);
-    
-
+      System.out.println(controller.getY()/speedMultiplier+speedAdder);  
   }
 
 
-  public void hatchMotorControl(){    
+  public void liftMotorControl(){    
     if(controller2.getTriggerAxis(Hand.kRight) > 0){
       motor_lift.setSpeed(1);
     }
@@ -240,12 +238,12 @@ public class Robot extends TimedRobot{
     }  
   }
 
-  public void liftMotorControl(){
+  public void hatchMotorControl(){
     if(controller2.getBumper(Hand.kRight)){
-      motor_panelGrabber.setSpeed(.375);
+      motor_panelGrabber.setSpeed(.875);
     }
     else if(controller2.getBumper(Hand.kLeft)){
-      motor_panelGrabber.setSpeed(-.375);
+      motor_panelGrabber.setSpeed(-.875);
     }
     else{
       motor_panelGrabber.setSpeed(0);
@@ -262,48 +260,45 @@ public class Robot extends TimedRobot{
   }
 
   public void cameraMovement(){
-
-      //right
-      if(controller.getPOV()==90){
-        moveCameraX(3);
-      }
-      //left
-      else if(controller.getPOV()==270){
-        moveCameraX(-3);    
-      }
-      //up
-      if(controller.getPOV()==0){
-        moveCameraY(3);
-      }
-      //down
-      else if(controller.getPOV()==180){
-        moveCameraY(-3);
-      }  
-      //up right
-      if(controller.getPOV()==45){
-        moveCameraX(2);
-        moveCameraY(2);
-      }
-      //down right
-      else if(controller.getPOV()==135){
-        moveCameraX(2);
-        moveCameraY(-2);
-      }
-      //down left
-      else if(controller.getPOV()==225){
-        moveCameraX(-2);
-        moveCameraY(-2);
-      }
-      //up left
-      else if(controller.getPOV()==315){
-        moveCameraX(-2);
-        moveCameraY(2);
-      }
-    
-  
-    
+      switch(controller.getPOV()){
+        //up  
+        case 0:
+          moveCameraY(3);
+          break;
+        //up right
+        case 45:
+          moveCameraX(2);
+          moveCameraY(2);
+          break;
+        //right
+        case 90:
+          moveCameraX(3);
+          break;
+        //down right
+        case 135:
+          moveCameraX(2);
+          moveCameraY(-2);
+          break;
+        //down
+        case 180:
+          moveCameraY(-3);
+          break;
+        //down left
+        case 225:
+          moveCameraX(-2);
+          moveCameraY(-2);
+          break;  
+        //left
+        case 270:
+          moveCameraX(-3);
+          break;        
+        //up left
+        case 315:
+          moveCameraX(-2);
+          moveCameraY(2);
+          break;
+      }    
   }
-
 
   public void breakInMotors(){
     if(controller.getRawButton(11)){

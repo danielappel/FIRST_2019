@@ -65,11 +65,13 @@ public class Robot extends TimedRobot{
   PWMVictorSPX motor_leftFront = new PWMVictorSPX(1);
   Spark motor_panelGrabber = new Spark(7);
   Spark motor_lift = new Spark(6);
+  
  
 
   // Servo Declarations
   Servo cameraServoX = new Servo (4);
   Servo cameraServoY = new Servo (5);
+  Servo linearAcServo = new Servo(8);
   
   // Controller Declarations
   Joystick controller = new Joystick(0);
@@ -181,6 +183,7 @@ public class Robot extends TimedRobot{
     cameraMovement();
     liftMotorControl();
     hatchMotorControl();
+    testLinearActuator();
     //breakInMotors();
   }
 
@@ -189,6 +192,19 @@ public class Robot extends TimedRobot{
    */
   @Override
   public void testPeriodic(){
+  }
+
+  public void testLinearActuator(){
+    if(controller.getRawButton(6)){
+      linearAcServo.set(1);
+    }
+    if(controller.getRawButton(7)){
+      linearAcServo.set(-1);
+    }
+    if(controller.getRawButton(8)){
+      linearAcServo.set(0);
+    }
+
   }
   
   public void visionCode(){

@@ -40,6 +40,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 
 import java.lang.Math;
+import edu.wpi.first.wpilibj.command.WaitCommand;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -85,6 +86,8 @@ public class Robot extends TimedRobot{
   private double speedMultiplier = 2.0;
   private int numberOfButton11Presses = 0;
   private double speedAdder = 0.0;
+  private int numberOfRightBumperPresses = 0;
+  private int numberOfLeftBumperPresses = 0;
     // Declarations for two stick driving on the xbox controller
     private double max_speed_Y = 0.75;
     private double max_speed_X = 0.5;
@@ -100,7 +103,9 @@ public class Robot extends TimedRobot{
   static double[]centerX;
   static double lengthBetweenContours;
 
-  // Hand Declarations
+  // Wait Command Declarations
+  private WaitCommand hatchWait = new WaitCommand(.25);
+  private WaitCommand liftWait = new WaitCommand(2);
 
   /**
    * This function is run when the robot is first started up and should be
@@ -226,26 +231,37 @@ public class Robot extends TimedRobot{
   }
 
 
-  public void liftMotorControl(){    
-    if(controller2.getTriggerAxis(Hand.kRight) > 0){
-      motor_lift.setSpeed(1);
+  public void liftMotorControl(){  
+    if(controller2.getBumperPressed(Hand.kLeft)){
+      numberOfLeftBumperPresses += 1;
     }
-    else if(controller2.getTriggerAxis(Hand.kLeft) > 0){
-      motor_lift.setSpeed(-1);
-    }
-    else{
+    
+    if(numberOfLeftBumperPresses > 0 && numberOfLeftBumperPresses % 2 == 1){
+      motor_lift.setSpeed(.5);
+      liftWait.start();
       motor_lift.setSpeed(0);
-    }  
+    }
+    else if(numberOfLeftBumperPresses > 0 && numberOfLeftBumperPresses % 2 == 0){
+      motor_lift.setSpeed(-.5);
+      liftWait.start();
+      motor_lift.setSpeed(0);
+    }
+
   }
 
   public void hatchMotorControl(){
-    if(controller2.getBumper(Hand.kRight)){
+    if(controller2.getBumperPressed(Hand.kRight)){
+      numberOfRightBumperPresses += 1;
+    }
+
+    if(numberOfRightBumperPresses > 0 && numberOfButton11Presses % 2 == 1){
       motor_panelGrabber.setSpeed(.875);
+      hatchWait.start();
+      motor_panelGrabber.setSpeed(0);
     }
-    else if(controller2.getBumper(Hand.kLeft)){
+    else if(numberOfRightBumperPresses > 0 && numberOfRightBumperPresses % 2 == 0){
       motor_panelGrabber.setSpeed(-.875);
-    }
-    else{
+      hatchWait.start();
       motor_panelGrabber.setSpeed(0);
     }
   }

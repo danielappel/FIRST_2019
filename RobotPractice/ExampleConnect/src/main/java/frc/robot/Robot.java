@@ -195,15 +195,13 @@ public class Robot extends TimedRobot{
   }
 
   public void testLinearActuator(){
-    if(controller.getRawButton(6)){
+    if(controller.getRawButton(5)){
       linearAcServo.set(1);
     }
-    if(controller.getRawButton(7)){
-      linearAcServo.set(-1);
+    if(controller.getRawButton(6)){
+      linearAcServo.set(0.1);
     }
-    if(controller.getRawButton(8)){
-      linearAcServo.set(0);
-    }
+    
 
   }
   

@@ -88,8 +88,10 @@ public class Robot extends TimedRobot{
   private double speedMultiplier = 2.0;
   private int numberOfButton11Presses = 0;
   private double speedAdder = 0.0;
+  private final double accelerateIncrement = 0.0;
   private int numberOfRightBumperPresses = 0;
   private int numberOfLeftBumperPresses = 0;
+
     // Declarations for two stick driving on the xbox controller
     private double max_speed_Y = 0.75;
     private double max_speed_X = 0.5;
@@ -106,7 +108,7 @@ public class Robot extends TimedRobot{
   static double lengthBetweenContours;
 
   // Wait Command Declarations
-  private WaitCommand hatchWait = new WaitCommand(.25);
+  private WaitCommand hatchWait = new WaitCommand(2);
   private WaitCommand liftWait = new WaitCommand(2);
 
   /**
@@ -184,6 +186,7 @@ public class Robot extends TimedRobot{
     liftMotorControl();
     hatchMotorControl();
     testLinearActuator();
+
     //breakInMotors();
   }
 
@@ -199,26 +202,10 @@ public class Robot extends TimedRobot{
       linearAcServo.set(1);
     }
     if(controller.getRawButton(6)){
-      linearAcServo.set(0.1);
+      linearAcServo.set(0.2);
     }
-    
-
   }
   
-  public void visionCode(){
-    Rect r = Imgproc.boundingRect(myPipeline.filterContoursOutput().get(0));
-    Rect r1 = Imgproc.boundingRect(myPipeline.filterContoursOutput().get(1));
-    centerX = new double[]{r1.x + (r1.width / 2), r.x + (r.width / 2)};
-    if(myPipeline.filterContoursOutput().size() == 2){
-      // subtracts one another to get length in pixels
-      lengthBetweenContours = Math.abs(centerX[0] - centerX[1]);
-      System.out.println("I see: " + centerX.length);
-    }
-  }
-
-  public void findCenter(){
-    
-  }
   public void robotMovement(){
     /*
     * when trigger is pressed full speed is enabled (this can be mapped to any button)
@@ -231,13 +218,19 @@ public class Robot extends TimedRobot{
       }
       else if(button4.get()){
         //hold button 4 to speed up "gradually"
-        if(speedAdder < .5) //safety
-          speedAdder += 0.005;
+        if(-1*controller.getY()>0 && speedAdder < .5) //safety
+          speedAdder += accelerateIncrement;
+        else if(-1*controller.getY()<0 && speedAdder > -.5){
+          speedAdder -= accelerateIncrement;
+        }
       }
       else{
         //default speed
         if(speedAdder > 0)
-          speedAdder -= 0.005;
+          speedAdder -= accelerateIncrement;
+        if(speedAdder < 0){
+          speedAdder += accelerateIncrement;
+        }
         speedMultiplier = 2;
       }
       myDrive.arcadeDrive(-1 * controller.getY()/speedMultiplier + speedAdder, controller.getAxis(Joystick.AxisType.kTwist)/speedMultiplier);
@@ -246,18 +239,15 @@ public class Robot extends TimedRobot{
 
 
   public void liftMotorControl(){  
-    if(controller2.getBumperPressed(Hand.kLeft)){
-      numberOfLeftBumperPresses += 1;
-    }
     
-    if(numberOfLeftBumperPresses > 0 && numberOfLeftBumperPresses % 2 == 1){
+    if(controller2.getAButton()){
       motor_lift.setSpeed(.5);
-      liftWait.start();
-      motor_lift.setSpeed(0);
     }
-    else if(numberOfLeftBumperPresses > 0 && numberOfLeftBumperPresses % 2 == 0){
+    else if(controller2.getBButton()){
       motor_lift.setSpeed(-.5);
-      liftWait.start();
+    }
+
+    if(controller2.getXButton()){
       motor_lift.setSpeed(0);
     }
 
@@ -268,14 +258,11 @@ public class Robot extends TimedRobot{
       numberOfRightBumperPresses += 1;
     }
 
-    if(numberOfRightBumperPresses > 0 && numberOfButton11Presses % 2 == 1){
-      motor_panelGrabber.setSpeed(.875);
-      hatchWait.start();
-      motor_panelGrabber.setSpeed(0);
+    if(controller2.getBumperPressed(Hand.kRight)){
     }
-    else if(numberOfRightBumperPresses > 0 && numberOfRightBumperPresses % 2 == 0){
-      motor_panelGrabber.setSpeed(-.875);
-      hatchWait.start();
+    else if(controller2.getBumperPressed(Hand.kLeft)){
+    }
+    if(controller2.getBButton()){
       motor_panelGrabber.setSpeed(0);
     }
   }
@@ -288,8 +275,15 @@ public class Robot extends TimedRobot{
   public void moveCameraY(int speed){
     cameraServoY.setAngle(cameraServoY.getAngle()+speed);
   }
-
+  
+  public void centerCamera(){
+    cameraServoX.setAngle(90);
+    cameraServoY.setAngle(90);
+  }
   public void cameraMovement(){
+      if(controller.getRawButton(10)){
+        centerCamera();
+      }
       switch(controller.getPOV()){
         //up  
         case 0:

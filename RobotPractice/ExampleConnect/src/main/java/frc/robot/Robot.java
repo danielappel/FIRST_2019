@@ -118,6 +118,8 @@ public class Robot extends TimedRobot{
   // Wait Command Declarations
   private Timer liftTimer = new Timer();
   private Timer hatchTimer = new Timer();
+  private Timer testTimer = new Timer();
+  private Timer testTimer2 = new Timer();
 
   /**
    * This function is run when the robot is first started up and should be
@@ -194,7 +196,7 @@ public class Robot extends TimedRobot{
     cameraMovement();
     liftMotorControl();
     hatchMotorControl();
-    //test();
+    test();
     
     /**
      * if(controller2.getXButton()){
@@ -208,7 +210,24 @@ public class Robot extends TimedRobot{
   }
 
   public void test(){
-    //System.out.println(testTimer.get() + "test");
+
+    if(controller2.getXButtonPressed()){
+      testTimer.start();
+      motor_lift.setSpeed(.75);
+    }
+    if(testTimer.get() > .5){
+      motor_lift.setSpeed(0);
+      testTimer.reset();
+    }
+
+    if(controller2.getYButtonPressed()){
+      testTimer2.start();
+      motor_lift.setSpeed(-.2);
+    }
+    if(testTimer2.get() > 1){
+      motor_lift.stopMotor();
+      testTimer2.reset();
+    }
   }
 
   /**
@@ -403,6 +422,15 @@ public class Robot extends TimedRobot{
           moveCameraY(2);
           break;
       }    
+
+  }
+
+  public void loadCargo(){
+
+
+  }
+
+  public void liftHatch(){
 
   }
 

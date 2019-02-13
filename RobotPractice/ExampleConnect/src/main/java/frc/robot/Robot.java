@@ -92,6 +92,8 @@ public class Robot extends TimedRobot{
   private int numberOfButton11Presses = 0;
   private double speedAdder = 0.0;
   private final double accelerateIncrement = 0.005;
+  private int numberOfRightBumperPresses = 0;
+  private int numberOfLeftBumperPresses = 0;
 
     // Declarations for two stick driving on the xbox controller
     private double max_speed_Y = 0.75;
@@ -183,15 +185,17 @@ public class Robot extends TimedRobot{
    */
   @Override
   public void teleopPeriodic() {
-    
+
     robotMovement();
     cameraMovement();
     liftMotorControl();
     hatchMotorControl();
-    if(controller2.getBButton()){
-      cameraServoX.setAngle(90);
-      cameraServoY.setAngle(90);
-    }
+    /**
+     * if(controller2.getXButton()){
+      centerCamera();
+      }
+     */
+    
     //testLinearActuator();
     //breakInMotors();
 
@@ -216,96 +220,68 @@ public class Robot extends TimedRobot{
   }
   
   public void robotMovement(){
-
+ /*
+    * when trigger is pressed full speed is enabled (this can be mapped to any button)
+    * when trigger is released robot moves at half speed
+    */
+      //jay is an epic gamer and this was his idea 
       if(button3.get()){
         //hold button 3 to keep robot slow
         speedMultiplier = 2.5;
       }
-
       else if(button4.get()){
-        speedMultiplier = 2;
         //hold button 4 to speed up "gradually"
-        if(controller.getY() > 0 && speedAdder < .5){    //safety
-          speedAdder += accelerateIncrement;
-          
-        } 
-
-        else if(controller.getY() < 0 && speedAdder > 0){    // safety
-          speedAdder -= accelerateIncrement;
-        }
-
+        if(speedAdder < .5) //safety
+          speedAdder += 0.005;
       }
-
       else{
         //default speed
-        if(speedAdder > 0){
-          speedAdder -= accelerateIncrement;
-        }
-
-        else if(speedAdder < 0){
-          speedAdder += accelerateIncrement;
-        }
-
+        if(speedAdder > 0)
+          speedAdder -= 0.005;
         speedMultiplier = 2;
       }
-
-    //System.out.println(speedAdder);
-    
-    myDrive.arcadeDrive(-1 * controller.getY()/speedMultiplier + speedAdder, controller.getAxis(Joystick.AxisType.kTwist)/speedMultiplier);
-
+      myDrive.arcadeDrive(-1 * controller.getY()/speedMultiplier + speedAdder, controller.getAxis(Joystick.AxisType.kTwist)/speedMultiplier);
+      System.out.println(controller.getY()/speedMultiplier+speedAdder);  
   }
 
 
   public void liftMotorControl(){  
-    
+
     if(controller2.getBumperPressed(Hand.kRight)){
-      testTimer.start();
-      System.out.println("test1");
-      if(testTimer.get() > 1){
-        System.out.println("test2");
-        motor_lift.setSpeed(.4);
-      }
-      else{
-        motor_lift.stopMotor();
-      }
-      testTimer.reset();
+      numberOfRightBumperPresses += 1;  
+    }
+    
+    if(numberOfRightBumperPresses % 2 == 1){
+      motor_lift.setSpeed(.4);
+      Timer.delay(.5);
+      motor_lift.stopMotor();
     }
 
-    else if(controller2.getBumperPressed(Hand.kLeft)){
-      testTimer.start();
-      if(testTimer.get() > 1){
-        motor_lift.setSpeed(-.4);
-      }
-      else {
-        motor_lift.stopMotor();
-      }
-      testTimer.reset();
+    else if(numberOfRightBumperPresses % 2 == 0 && numberOfRightBumperPresses != 0){
+      motor_lift.setSpeed(-.4);
+      Timer.delay(.5);
+      motor_lift.stopMotor();
     }
 
   }
 
   public void hatchMotorControl(){
-    System.out.println(66);
-    if(controller2.getYButton()){
-      System.out.println(1);
-      //hatchTimer
-      if(hatchTimer.isRunning()){
-        System.out.println(100);
-        motor_panelGrabber.setSpeed(.5);
-      }
-      else if(hatchTimer.isCompleted()){
-        motor_panelGrabber.stopMotor();
-      }
+
+    if(controller2.getBumperPressed(Hand.kLeft)){
+      numberOfLeftBumperPresses += 1;
+    }
+
+
+    if(numberOfLeftBumperPresses % 2 == 1){
+      motor_panelGrabber.setSpeed(.5);
+      Timer.delay(.5);
+      motor_panelGrabber.stopMotor();
     }
       
-    else if(controller2.getXButton()){
-      hatchTimer.start();
-      if(hatchTimer.isRunning()){
-        motor_panelGrabber.setSpeed(-.5);
-      }
-      else if(hatchTimer.isCompleted()){
-        motor_panelGrabber.stopMotor();
-      }   
+    else if(numberOfLeftBumperPresses % 2 == 0 && numberOfLeftBumperPresses != 0){
+      motor_panelGrabber.setSpeed(-.5);
+      Timer.delay(.5);
+      motor_panelGrabber.stopMotor();   
     }
 
   }

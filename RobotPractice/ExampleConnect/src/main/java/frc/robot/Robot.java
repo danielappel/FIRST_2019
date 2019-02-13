@@ -40,6 +40,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 
 import java.lang.Math;
+import edu.wpi.first.wpilibj.Timer;
 
 import edu.wpi.first.wpilibj.command.TimedCommand;
 import edu.wpi.first.wpilibj.command.WaitCommand;
@@ -112,6 +113,7 @@ public class Robot extends TimedRobot{
   // Wait Command Declarations
   private TimedCommand hatchTimer = new TimedCommand(.5);
   private TimedCommand liftTimer = new TimedCommand(.5);
+  private Timer testTimer = new Timer();
 
   /**
    * This function is run when the robot is first started up and should be
@@ -183,7 +185,7 @@ public class Robot extends TimedRobot{
    */
   @Override
   public void teleopPeriodic() {
-    
+
     robotMovement();
     cameraMovement();
     liftMotorControl();
@@ -212,86 +214,68 @@ public class Robot extends TimedRobot{
   }
   
   public void robotMovement(){
-
+ /*
+    * when trigger is pressed full speed is enabled (this can be mapped to any button)
+    * when trigger is released robot moves at half speed
+    */
+      //jay is an epic gamer and this was his idea 
       if(button3.get()){
         //hold button 3 to keep robot slow
         speedMultiplier = 2.5;
       }
-
       else if(button4.get()){
         //hold button 4 to speed up "gradually"
-        if(controller.getY() > 0 && speedAdder < .5){   //safety
-          speedAdder += accelerateIncrement;
-        } 
-
-        else if(controller.getY() < 0 && speedAdder > -.5){    // safety
-          speedAdder -= accelerateIncrement;
-        }
-
+        if(speedAdder < .5) //safety
+          speedAdder += 0.005;
       }
-
       else{
         //default speed
-        if(speedAdder > 0){
-          speedAdder -= accelerateIncrement;
-        }
-
-        else if(speedAdder < 0){
-          speedAdder += accelerateIncrement;
-        }
-
+        if(speedAdder > 0)
+          speedAdder -= 0.005;
         speedMultiplier = 2;
       }
-
       myDrive.arcadeDrive(-1 * controller.getY()/speedMultiplier + speedAdder, controller.getAxis(Joystick.AxisType.kTwist)/speedMultiplier);
-
+      System.out.println(controller.getY()/speedMultiplier+speedAdder);  
   }
 
 
   public void liftMotorControl(){  
-    
+
     if(controller2.getBumperPressed(Hand.kRight)){
-      liftTimer.start();
-      if(liftTimer.isRunning()){
-        motor_lift.setSpeed(.4);
-      }
-      else if(liftTimer.isCompleted()){
-        motor_lift.stopMotor();
-      }
+      numberOfRightBumperPresses += 1;  
+    }
+    
+    if(numberOfRightBumperPresses % 2 == 1){
+      motor_lift.setSpeed(.4);
+      Timer.delay(.5);
+      motor_lift.stopMotor();
     }
 
-    else if(controller2.getBumperPressed(Hand.kLeft)){
-      liftTimer.start();
-      if(liftTimer.isRunning()){
-        motor_lift.setSpeed(-.4);
-      }
-      else if(liftTimer.isCompleted()){
-        motor_lift.stopMotor();
-      }
+    else if(numberOfRightBumperPresses % 2 == 0 && numberOfRightBumperPresses != 0){
+      motor_lift.setSpeed(-.4);
+      Timer.delay(.5);
+      motor_lift.stopMotor();
     }
 
   }
 
   public void hatchMotorControl(){
 
-    if(controller2.getTriggerAxis(Hand.kRight) > 0){
-      hatchTimer.start();
-      if(hatchTimer.isRunning()){
-        motor_panelGrabber.setSpeed(.5);
-      }
-      else if(hatchTimer.isCompleted()){
-        motor_panelGrabber.stopMotor();
-      }
+    if(controller2.getBumperPressed(Hand.kLeft)){
+      numberOfLeftBumperPresses += 1;
+    }
+
+
+    if(numberOfLeftBumperPresses % 2 == 1){
+      motor_panelGrabber.setSpeed(.5);
+      Timer.delay(.5);
+      motor_panelGrabber.stopMotor();
     }
       
-    else if(controller2.getTriggerAxis(Hand.kLeft) > 0){
-      hatchTimer.start();
-      if(hatchTimer.isRunning()){
-        motor_panelGrabber.setSpeed(-.5);
-      }
-      else if(hatchTimer.isCompleted()){
-        motor_panelGrabber.stopMotor();
-      }   
+    else if(numberOfLeftBumperPresses % 2 == 0 && numberOfLeftBumperPresses != 0){
+      motor_panelGrabber.setSpeed(-.5);
+      Timer.delay(.5);
+      motor_panelGrabber.stopMotor();   
     }
 
   }

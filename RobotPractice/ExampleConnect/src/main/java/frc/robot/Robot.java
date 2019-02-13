@@ -190,6 +190,12 @@ public class Robot extends TimedRobot{
     cameraMovement();
     liftMotorControl();
     hatchMotorControl();
+    /**
+     * if(controller2.getXButton()){
+      centerCamera();
+      }
+     */
+    
     //testLinearActuator();
     //breakInMotors();
 

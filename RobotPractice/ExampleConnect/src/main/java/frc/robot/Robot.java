@@ -40,6 +40,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 
 import java.lang.Math;
+import edu.wpi.first.wpilibj.Timer;
 
 import edu.wpi.first.wpilibj.command.TimedCommand;
 import edu.wpi.first.wpilibj.command.WaitCommand;
@@ -90,9 +91,7 @@ public class Robot extends TimedRobot{
   private double speedMultiplier = 2.0;
   private int numberOfButton11Presses = 0;
   private double speedAdder = 0.0;
-  private final double accelerateIncrement = 0.05;
-  private int numberOfRightBumperPresses = 0;
-  private int numberOfLeftBumperPresses = 0;
+  private final double accelerateIncrement = 0.005;
 
     // Declarations for two stick driving on the xbox controller
     private double max_speed_Y = 0.75;
@@ -112,6 +111,7 @@ public class Robot extends TimedRobot{
   // Wait Command Declarations
   private TimedCommand hatchTimer = new TimedCommand(.5);
   private TimedCommand liftTimer = new TimedCommand(.5);
+  private Timer testTimer = new Timer();
 
   /**
    * This function is run when the robot is first started up and should be
@@ -188,6 +188,10 @@ public class Robot extends TimedRobot{
     cameraMovement();
     liftMotorControl();
     hatchMotorControl();
+    if(controller2.getBButton()){
+      cameraServoX.setAngle(90);
+      cameraServoY.setAngle(90);
+    }
     //testLinearActuator();
     //breakInMotors();
 
@@ -219,12 +223,14 @@ public class Robot extends TimedRobot{
       }
 
       else if(button4.get()){
+        speedMultiplier = 2;
         //hold button 4 to speed up "gradually"
-        if(controller.getY() > 0 && speedAdder < .5){   //safety
+        if(controller.getY() > 0 && speedAdder < .5){    //safety
           speedAdder += accelerateIncrement;
+          
         } 
 
-        else if(controller.getY() < 0 && speedAdder > -.5){    // safety
+        else if(controller.getY() < 0 && speedAdder > 0){    // safety
           speedAdder -= accelerateIncrement;
         }
 
@@ -243,7 +249,9 @@ public class Robot extends TimedRobot{
         speedMultiplier = 2;
       }
 
-      myDrive.arcadeDrive(-1 * controller.getY()/speedMultiplier + speedAdder, controller.getAxis(Joystick.AxisType.kTwist)/speedMultiplier);
+    //System.out.println(speedAdder);
+    
+    myDrive.arcadeDrive(-1 * controller.getY()/speedMultiplier + speedAdder, controller.getAxis(Joystick.AxisType.kTwist)/speedMultiplier);
 
   }
 
@@ -251,32 +259,38 @@ public class Robot extends TimedRobot{
   public void liftMotorControl(){  
     
     if(controller2.getBumperPressed(Hand.kRight)){
-      liftTimer.start();
-      if(liftTimer.isRunning()){
+      testTimer.start();
+      System.out.println("test1");
+      if(testTimer.get() > 1){
+        System.out.println("test2");
         motor_lift.setSpeed(.4);
       }
-      else if(liftTimer.isCompleted()){
+      else{
         motor_lift.stopMotor();
       }
+      testTimer.reset();
     }
 
     else if(controller2.getBumperPressed(Hand.kLeft)){
-      liftTimer.start();
-      if(liftTimer.isRunning()){
+      testTimer.start();
+      if(testTimer.get() > 1){
         motor_lift.setSpeed(-.4);
       }
-      else if(liftTimer.isCompleted()){
+      else {
         motor_lift.stopMotor();
       }
+      testTimer.reset();
     }
 
   }
 
   public void hatchMotorControl(){
-
-    if(controller2.getTriggerAxis(Hand.kRight) > 0){
-      hatchTimer.start();
+    System.out.println(66);
+    if(controller2.getYButton()){
+      System.out.println(1);
+      //hatchTimer
       if(hatchTimer.isRunning()){
+        System.out.println(100);
         motor_panelGrabber.setSpeed(.5);
       }
       else if(hatchTimer.isCompleted()){
@@ -284,7 +298,7 @@ public class Robot extends TimedRobot{
       }
     }
       
-    else if(controller2.getTriggerAxis(Hand.kLeft) > 0){
+    else if(controller2.getXButton()){
       hatchTimer.start();
       if(hatchTimer.isRunning()){
         motor_panelGrabber.setSpeed(-.5);

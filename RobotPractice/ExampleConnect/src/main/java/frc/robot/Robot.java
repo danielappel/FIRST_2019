@@ -94,6 +94,11 @@ public class Robot extends TimedRobot{
   private final double accelerateIncrement = 0.005;
   private int numberOfRightBumperPresses = 0;
   private int numberOfLeftBumperPresses = 0;
+  private boolean liftTimerBoolean = true;
+  private boolean rightBumperBoolean = false;
+  private boolean hatchTimerBoolean = true;
+  private boolean leftBumperBoolean = false;
+  private int test = 0;
 
     // Declarations for two stick driving on the xbox controller
     private double max_speed_Y = 0.75;
@@ -111,9 +116,8 @@ public class Robot extends TimedRobot{
   static double lengthBetweenContours;
 
   // Wait Command Declarations
-  private TimedCommand hatchTimer = new TimedCommand(.5);
-  private TimedCommand liftTimer = new TimedCommand(.5);
-  private Timer testTimer = new Timer();
+  private Timer liftTimer = new Timer();
+  private Timer hatchTimer = new Timer();
 
   /**
    * This function is run when the robot is first started up and should be
@@ -190,6 +194,8 @@ public class Robot extends TimedRobot{
     cameraMovement();
     liftMotorControl();
     hatchMotorControl();
+    //test();
+    
     /**
      * if(controller2.getXButton()){
       centerCamera();
@@ -199,6 +205,10 @@ public class Robot extends TimedRobot{
     //testLinearActuator();
     //breakInMotors();
 
+  }
+
+  public void test(){
+    //System.out.println(testTimer.get() + "test");
   }
 
   /**
@@ -241,47 +251,87 @@ public class Robot extends TimedRobot{
         speedMultiplier = 2;
       }
       myDrive.arcadeDrive(-1 * controller.getY()/speedMultiplier + speedAdder, controller.getAxis(Joystick.AxisType.kTwist)/speedMultiplier);
-      System.out.println(controller.getY()/speedMultiplier+speedAdder);  
+      //System.out.println(controller.getY()/speedMultiplier+speedAdder);  
   }
 
 
   public void liftMotorControl(){  
 
     if(controller2.getBumperPressed(Hand.kRight)){
-      numberOfRightBumperPresses += 1;  
-    }
-    
-    if(numberOfRightBumperPresses % 2 == 1){
-      motor_lift.setSpeed(.4);
-      Timer.delay(.5);
-      motor_lift.stopMotor();
+      rightBumperBoolean = true;
     }
 
-    else if(numberOfRightBumperPresses % 2 == 0 && numberOfRightBumperPresses != 0){
-      motor_lift.setSpeed(-.4);
-      Timer.delay(.5);
-      motor_lift.stopMotor();
+    
+    if(liftTimerBoolean && rightBumperBoolean){
+        liftTimer.start();
     }
+
+    if(rightBumperBoolean){
+      
+      if(liftTimer.get() < 1){
+        motor_lift.setSpeed(.4);
+        liftTimerBoolean = false;
+      }
+      else{
+        motor_lift.stopMotor();
+        liftTimer.reset();
+        liftTimerBoolean = true;
+        rightBumperBoolean = false;
+      }
+      
+    }
+
+    
 
   }
 
   public void hatchMotorControl(){
 
     if(controller2.getBumperPressed(Hand.kLeft)){
+      leftBumperBoolean = true;
       numberOfLeftBumperPresses += 1;
+
+      if(numberOfLeftBumperPresses % 2 == 1){
+        test = 1;
+      }
+      else if(numberOfLeftBumperPresses % 2 == 0){
+        test = 2;
+      }
+
     }
 
-
-    if(numberOfLeftBumperPresses % 2 == 1){
-      motor_panelGrabber.setSpeed(.5);
-      Timer.delay(.5);
-      motor_panelGrabber.stopMotor();
+  
+    if(hatchTimerBoolean && leftBumperBoolean){
+        hatchTimer.start();
     }
+
+    if(leftBumperBoolean && test == 1){
       
-    else if(numberOfLeftBumperPresses % 2 == 0 && numberOfLeftBumperPresses != 0){
-      motor_panelGrabber.setSpeed(-.5);
-      Timer.delay(.5);
-      motor_panelGrabber.stopMotor();   
+      if(hatchTimer.get() < .5){
+        motor_panelGrabber.setSpeed(-.5);
+        hatchTimerBoolean = false;
+      }
+      else{
+        motor_panelGrabber.stopMotor();
+        hatchTimer.reset();
+        hatchTimerBoolean = true;
+        leftBumperBoolean = false;
+        test = 0;
+      }
+      
+    }
+    else if(leftBumperBoolean && test == 2){
+      if(hatchTimer.get() < .5){
+        motor_panelGrabber.setSpeed(.5);
+        hatchTimerBoolean = false;
+      }
+      else{
+        motor_panelGrabber.stopMotor();
+        hatchTimer.reset();
+        hatchTimerBoolean = true;
+        leftBumperBoolean = false;
+        test = 0;
+      }
     }
 
   }

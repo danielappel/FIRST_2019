@@ -129,7 +129,7 @@ public class Robot extends TimedRobot{
   public void robotInit() {      
       UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
       camera.setResolution(640, 480);
-      
+      camera.setFPS(15);
 
     // new stuff
     /*m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
@@ -228,6 +228,16 @@ public class Robot extends TimedRobot{
       motor_lift.stopMotor();
       testTimer2.reset();
     }
+    if(controller.getRawButton(5)){
+      motor_lift.setSpeed(1);
+    }
+    else if(controller.getRawButton(6)){
+      motor_lift.setSpeed(0.8);
+    }
+    else{
+      motor_lift.stopMotor();
+    }
+     
   }
 
   /**
@@ -237,16 +247,6 @@ public class Robot extends TimedRobot{
   public void testPeriodic(){
   }
 
-  public void testLinearActuator(){
-
-    if(controller.getRawButton(5)){
-      linearAcServo.set(1);
-    }
-    else if(controller.getRawButton(6)){
-      linearAcServo.set(0.2);
-    }
-
-  }
   
   public void robotMovement(){
  /*
@@ -358,14 +358,14 @@ public class Robot extends TimedRobot{
 
   public void moveCameraX(int speed){
 
-    cameraServoX.setAngle(cameraServoX.getAngle()+speed);
+    cameraServoX.setAngle(cameraServoX.getAngle()-speed);
 
   }
 
 
   public void moveCameraY(int speed){
 
-    cameraServoY.setAngle(cameraServoY.getAngle()+speed);
+    cameraServoY.setAngle(cameraServoY.getAngle()-speed);
 
   }
   
@@ -373,7 +373,7 @@ public class Robot extends TimedRobot{
   public void centerCamera(){
 
     cameraServoX.setAngle(90);
-    cameraServoY.setAngle(90);
+    cameraServoY.setAngle(55);
 
   }
 

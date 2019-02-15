@@ -92,12 +92,12 @@ public class Robot extends TimedRobot{
   private int numberOfButton11Presses = 0;
   private double speedAdder = 0.0;
   private final double accelerateIncrement = 0.005;
-  private int numberOfRightBumperPresses = 0;
-  private int numberOfLeftBumperPresses = 0;
+  private int numberOfAButtonPresses = 0;
   private boolean liftTimerBoolean = true;
   private boolean rightBumperBoolean = false;
   private boolean hatchTimerBoolean = true;
   private boolean leftBumperBoolean = false;
+  private int buttonAIdentifier = 0;
   private int test = 0;
 
     // Declarations for two stick driving on the xbox controller
@@ -194,9 +194,13 @@ public class Robot extends TimedRobot{
 
     robotMovement();
     cameraMovement();
-    liftMotorControl();
-    hatchMotorControl();
+    if(controller2.getXButtonPressed()){
+      centerCamera();
+    }
+    //liftMotorControl();
+    //hatchMotorControl();
     test();
+    test2();
     
     /**
      * if(controller2.getXButton()){
@@ -209,35 +213,83 @@ public class Robot extends TimedRobot{
 
   }
 
+  public void test2(){
+    if(controller2.getRawButton(1)){
+      motor_panelGrabber.setSpeed(-.85);
+    }
+    else if(controller2.getRawButton(4)){
+      motor_panelGrabber.setSpeed(.85);
+    }
+    else{
+      motor_panelGrabber.setSpeed(0);
+    }
+  }
+
   public void test(){
 
-    if(controller2.getXButtonPressed()){
-      testTimer.start();
-      motor_lift.setSpeed(.75);
-    }
-    if(testTimer.get() > .5){
-      motor_lift.setSpeed(0);
-      testTimer.reset();
-    }
 
-    if(controller2.getYButtonPressed()){
-      testTimer2.start();
-      motor_lift.setSpeed(-.2);
+    if(controller2.getBumperPressed(Hand.kRight)){
+      startTimer(testTimer);
+      System.out.println("1.1");
+      rightBumperBoolean =  true;
     }
-    if(testTimer2.get() > 1){
-      motor_lift.stopMotor();
-      testTimer2.reset();
+    else if(controller2.getBumperPressed(Hand.kLeft)){
+      startTimer(testTimer);
+      System.out.println("1/2");
+      leftBumperBoolean = true;
     }
-    if(controller.getRawButton(5)){
+    
+
+    if(rightBumperBoolean){
       motor_lift.setSpeed(1);
+      System.out.println("2");
+      System.out.println(testTimer.get());
+
+      if(testTimer.get() > 1.5){
+        System.out.println("3");
+        motor_lift.stopMotor();
+        rightBumperBoolean = false;
+        stopTimer(testTimer);
+        resetTimer(testTimer);
+      }
+
     }
-    else if(controller.getRawButton(6)){
-      motor_lift.setSpeed(0.8);
+    else if(leftBumperBoolean){
+      motor_lift.setSpeed(.95);
+
+      if(testTimer.get() > 2){
+        motor_lift.stopMotor();
+        leftBumperBoolean = false;
+        stopTimer(testTimer);
+        resetTimer(testTimer);
+      }
     }
     else{
       motor_lift.stopMotor();
     }
-     
+
+
+
+
+
+    if(controller.getRawButton(7)){
+      linearAcServo.set(1.0);
+    }
+    if(controller.getRawButton(8)){
+      linearAcServo.set(0.2);
+    }
+  }
+
+  private void startTimer(Timer t){
+    t.start();
+  }
+
+  private void stopTimer(Timer t){
+    t.stop();
+  }
+
+  private void resetTimer(Timer t){
+    t.reset();
   }
 
   /**
@@ -278,17 +330,19 @@ public class Robot extends TimedRobot{
 
     if(controller2.getBumperPressed(Hand.kRight)){
       rightBumperBoolean = true;
+      System.out.println("1");
     }
 
     
     if(liftTimerBoolean && rightBumperBoolean){
         liftTimer.start();
+        
     }
 
     if(rightBumperBoolean){
       
-      if(liftTimer.get() < 1){
-        motor_lift.setSpeed(.4);
+      if(liftTimer.get() < 2){
+        motor_lift.setSpeed(.7);
         liftTimerBoolean = false;
       }
       else{
@@ -303,55 +357,46 @@ public class Robot extends TimedRobot{
     
 
   }
-
-  public void hatchMotorControl(){
-
-    if(controller2.getBumperPressed(Hand.kLeft)){
-      leftBumperBoolean = true;
-      numberOfLeftBumperPresses += 1;
-
-      if(numberOfLeftBumperPresses % 2 == 1){
-        test = 1;
-      }
-      else if(numberOfLeftBumperPresses % 2 == 0){
-        test = 2;
-      }
-
-    }
-
   
-    if(hatchTimerBoolean && leftBumperBoolean){
-        hatchTimer.start();
+  public void liftMotorv2(){
+    
+  }
+  public void hatchMotorControl(){
+    if(controller2.getAButtonPressed()){
+      startTimer(hatchTimer);
+      numberOfAButtonPresses += 1;
+    }
+    if(numberOfAButtonPresses % 2 == 1){
+      buttonAIdentifier = 1;
+    }
+    else if(numberOfAButtonPresses % 2 == 0 && numberOfAButtonPresses != 0){
+      buttonAIdentifier = 2;
     }
 
-    if(leftBumperBoolean && test == 1){
-      
-      if(hatchTimer.get() < .5){
-        motor_panelGrabber.setSpeed(-.5);
-        hatchTimerBoolean = false;
-      }
-      else{
+    if(buttonAIdentifier == 1){
+      motor_panelGrabber.setSpeed(-.75);
+
+      if(hatchTimer.get() > .75){
         motor_panelGrabber.stopMotor();
-        hatchTimer.reset();
-        hatchTimerBoolean = true;
-        leftBumperBoolean = false;
-        test = 0;
-      }
-      
-    }
-    else if(leftBumperBoolean && test == 2){
-      if(hatchTimer.get() < .5){
-        motor_panelGrabber.setSpeed(.5);
-        hatchTimerBoolean = false;
-      }
-      else{
-        motor_panelGrabber.stopMotor();
-        hatchTimer.reset();
-        hatchTimerBoolean = true;
-        leftBumperBoolean = false;
-        test = 0;
+        buttonAIdentifier = 0;
+        stopTimer(hatchTimer);
+        resetTimer(hatchTimer);
       }
     }
+    else if(buttonAIdentifier == 2){
+      motor_panelGrabber.setSpeed(.75);
+
+      if(hatchTimer.get() > .75){
+        motor_panelGrabber.stopMotor();
+        buttonAIdentifier = 0;
+        stopTimer(hatchTimer);
+        resetTimer(hatchTimer);
+      }
+    }
+    else{
+      motor_panelGrabber.stopMotor();
+    }
+   
 
   }
 
@@ -380,14 +425,10 @@ public class Robot extends TimedRobot{
 
   public void cameraMovement(){
 
-      if(controller.getRawButton(10)){
-        centerCamera();
-      }
-
       switch(controller.getPOV()){
         //up  
         case 0:
-          moveCameraY(3);
+          moveCameraY(2);
           break;
         //up right
         case 45:
@@ -396,7 +437,7 @@ public class Robot extends TimedRobot{
           break;
         //right
         case 90:
-          moveCameraX(3);
+          moveCameraX(2);
           break;
         //down right
         case 135:
